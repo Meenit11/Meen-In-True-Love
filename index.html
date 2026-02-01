@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <style>
+        :root {
+            --primary-pink: #ff6b6b;
+            --soft-pink: #ff9a9e;
+            --peach: #fad0c4;
+            --box-bg: #ffffff;
+            /* Updated to match image background */
+            --text-color: #333;
+            /* Darker text for white background contrast if needed, or keep white if background is dark?
+                                   Wait, if box is white, text should be dark. Original text was #ffffff (white).
+                                   If box is white to match image, text needs to be visible. Changing text color to dark grey. */
+            --primary-text: #ff6b6b;
+            /* Use pink for main text to fit theme if background is white */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Darkened palette as requested */
+            background: linear-gradient(-45deg, #e66b6b, #e08e8e, #dcb5a0, #d98cb3);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Shard for button shatter */
+        .shard {
+            position: absolute;
+            background: linear-gradient(-45deg, #e66b6b, #e08e8e, #dcb5a0, #d98cb3);
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 100;
+            /* Max z-index */
+        }
+
+        /* Floating Props */
+        .props-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .prop {
+            position: absolute;
+            opacity: 0.6;
+            animation: floatUp 20s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(110vh) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(-10vh) rotate(360deg);
+            }
+        }
+
+        /* Prop Shapes */
+        .heart-shape {
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.6);
+            transform: rotate(45deg);
+        }
+
+        .heart-shape::before,
+        .heart-shape::after {
+            content: '';
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .heart-shape::before {
+            left: -15px;
+        }
+
+        .heart-shape::after {
+            top: -15px;
+        }
+
+        .circle-shape {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+        }
+
+        .ring-shape {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .star-shape {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid rgba(255, 255, 255, 0.6);
+            position: relative;
+        }
+
+        .star-shape:after {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid rgba(255, 255, 255, 0.6);
+            position: absolute;
+            content: "";
+            top: 6px;
+            left: -10px;
+        }
+
+        /* Simple Rose Shape (CSS construction) */
+        .rose-shape {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 182, 193, 0.8);
+            border-radius: 50% 0 50% 50%;
+            transform: rotate(45deg);
+            box-shadow: inset 5px 5px rgba(255, 105, 180, 0.5);
+        }
+
+        /* Main Container */
+        .main-box {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            height: 600px;
+            background-color: var(--box-bg);
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Justify content manually via spacing in children to control layout better for the animations */
+            z-index: 10;
+            overflow: hidden;
+            /* Keep for border radius, manage z-index internal */
+            transition: all 0.5s ease;
+        }
+
+        .content-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+            /* Position towards top */
+        }
+
+        /* Layout for Title and Video side-by-side */
+        .header-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            /* Close gap */
+            margin-top: 30px;
+            width: 100%;
+            z-index: 5;
+            transition: opacity 0.8s ease;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            /* Increased size */
+            color: var(--primary-text);
+            text-shadow: none;
+            margin: 0;
+            text-align: right;
+            line-height: 1.1;
+            z-index: 5;
+            transition: opacity 0.8s ease;
+            position: relative;
+        }
+
+        /* Video Styling */
+        .lover-video {
+            width: 280px;
+            /* Increased size */
+            border-radius: 20px;
+            object-fit: cover;
+            position: relative;
+            z-index: 50;
+            /* High z-index to stay on top */
+            transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+            /* box-shadow removed as per request */
+            border: none;
+            outline: none;
+        }
+
+        /* Layout tweak: The prompt says "Video positioned RIGHT BESIDE the title".
+           So let's change the layout strategy for the top section.
+        */
+        /* .header-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            Reduced top margin
+            width: 100%;
+            transition: opacity 0.8s ease;
+            z-index: 5;
+        } */
+
+        /* .header-group h1 {
+            font-size: 2.5rem;
+            margin: 0;
+        } */
+
+        .header-group .video-placeholder {
+            width: 250px;
+            height: 150px;
+            /* Aspect ratio placeholder */
+            position: relative;
+        }
+
+        .lover-video.initial-pos {
+            position: relative;
+            /* In flow initially */
+            top: auto;
+            left: auto;
+            transform: none;
+        }
+
+        .buttons-container {
+            margin-top: auto;
+            margin-bottom: 80px;
+            width: 80%;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            height: 60px;
+            z-index: 20;
+            /* Buttons above everything */
+            /* Height for buttons */
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            /* Match darkened body gradient */
+            background: linear-gradient(-45deg, #e66b6b, #e08e8e, #dcb5a0, #d98cb3);
+            background-size: 300%;
+            animation: gradientBG 5s ease infinite;
+            color: white;
+            /* White text on gradient */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: absolute;
+            /* Absolute for movement */
+        }
+
+        #yesBtn {
+            left: 0;
+        }
+
+        /* Faster transition specifically for No Button movement */
+        #noBtn {
+            right: 0;
+            z-index: 20;
+            transition: top 0.15s ease-out, left 0.15s ease-out, opacity 0.5s;
+            /* Fast movement */
+        }
+
+        /* Yes Button Hover */
+        #yesBtn:hover {
+            transform: scale(1.6);
+            /* User requested more big */
+            background-color: #fff0f5;
+            color: #ff3366;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 50, 100, 0.4);
+        }
+
+        /* Crashed Gradient Effect for Click */
+        .crashed-gradient {
+            background: linear-gradient(45deg, #ff00cc, #333399, #ff6b6b, #ffd700);
+            background-size: 300% 300%;
+            animation: crashAnim 0.5s ease infinite !important;
+            color: white !important;
+            border: 2px solid white !important;
+        }
+
+        @keyframes crashAnim {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Sparkles for Yes Hover */
+        .sparkle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #ff6b6b;
+            /* Colored sparkles for white bg */
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkleAnim 1s linear forwards;
+        }
+
+        @keyframes sparkleAnim {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        /* Success Message */
+        .success-message {
+            position: absolute;
+            top: 50px;
+            width: 80%;
+            text-align: center;
+            font-size: 2rem;
+            color: #333;
+            /* Dark text */
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+            text-shadow: none;
+        }
+
+        /* Explosion Elements */
+        .explosion-particle {
+            position: absolute;
+            pointer-events: none;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="props-container" id="propsContainer">
+        <!-- JS will populate random props -->
+    </div>
+
+    <div class="main-box" id="mainBox">
+
+        <div class="header-group" id="headerGroup">
+            <h1 id="mainTitle">Will You Be My<br>Valentine?</h1>
+            <!-- Video back in header for side-by-side -->
+            <video id="videoElement" class="lover-video" muted playsinline>
+                <source src="lover.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            You took too much time in clicking yes,<br>
+            Nevermind, better late than never! 💕
+        </div>
+
+        <div class="buttons-container" id="btnContainer">
+            <button id="yesBtn">Yes 💕</button>
+            <button id="noBtn">No</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. PROPS GENERATION ---
+        const propsContainer = document.getElementById('propsContainer');
+        const shapes = ['heart-shape', 'circle-shape', 'ring-shape', 'star-shape', 'rose-shape'];
+        // Updated colors to pop against white/lighter background
+        const colors = ['#ff9a9e', '#ff6b6b', '#ffd1dc', '#ffb7b2', '#ffcccb'];
+
+        function createProp(side) {
+            const prop = document.createElement('div');
+            const shapeClass = shapes[Math.floor(Math.random() * shapes.length)];
+            prop.classList.add('prop');
+
+            // Inner shape
+            const inner = document.createElement('div');
+            inner.classList.add(shapeClass);
+
+            // Randomly colorize if possible/needed, mostly defined in CSS but lets add some variety opacity
+            inner.style.opacity = Math.random() * 0.5 + 0.3;
+            if (shapeClass !== 'rose-shape' && shapeClass !== 'circle-shape') { // Rose and circle have spec gradients
+                inner.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            prop.appendChild(inner);
+
+            // Positioning: 'side' argument to ensure balance
+            // 0 = left (0-50vw), 1 = right (50-100vw)
+            let leftPos;
+            if (side === 'left') {
+                leftPos = Math.random() * 45; // 0 to 45vw
+            } else {
+                leftPos = Math.random() * 45 + 50; // 50 to 95vw
+            }
+            prop.style.left = leftPos + 'vw';
+
+            const scale = Math.random() * 0.8 + 0.5;
+            prop.style.transform = `scale(${scale})`;
+
+            // Random animation duration
+            const duration = Math.random() * 10 + 15; // 15-25s
+            prop.style.animationDuration = duration + 's';
+
+            // Random delay
+            prop.style.animationDelay = '-' + (Math.random() * 20) + 's'; // Start at different times
+
+            propsContainer.appendChild(prop);
+        }
+
+        // Create 100 props (50 left, 50 right)
+        for (let i = 0; i < 50; i++) {
+            createProp('left');
+            createProp('right');
+        }
+
+
+        // --- 2. NO BUTTON RUNAWAY LOGIC (PREDEFINED POSITIONS) ---
+        const noBtn = document.getElementById('noBtn');
+        const mainBox = document.getElementById('mainBox');
+
+        // SAFE ZONES:
+        // Yes button is Bottom-Left (approx 80-90% top, 0-20% left).
+        // Video is Top-Center (approx 0-40% top, 30-70% left).
+        // We pick spots that avoid these.
+        const possiblePositions = [
+            { top: '80%', left: '80%' }, // Bottom Right (Safe)
+            { top: '50%', left: '80%' }, // Middle Right (Safe)
+            { top: '50%', left: '10%' }, // Middle Left (Safe)
+            { top: '10%', left: '10%' }, // Top Left (Safe)
+            { top: '10%', left: '80%' }  // Top Right (Safe)
+        ];
+        let currentPosIndex = -1;
+
+        noBtn.addEventListener('mousemove', function (e) {
+            runaway();
+        });
+
+        document.addEventListener('mousemove', function (e) {
+            const rect = noBtn.getBoundingClientRect();
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            const btnX = rect.left + rect.width / 2;
+            const btnY = rect.top + rect.height / 2;
+            const dist = Math.sqrt(Math.pow(mouseX - btnX, 2) + Math.pow(mouseY - btnY, 2));
+
+            if (dist < 250) {
+                runaway();
+            }
+        });
+
+        function runaway() {
+            // Move noBtn to mainBox scope if not already
+            if (noBtn.parentElement.id === 'btnContainer') {
+                const rect = noBtn.getBoundingClientRect();
+                const boxRect = mainBox.getBoundingClientRect();
+                mainBox.appendChild(noBtn);
+                noBtn.style.left = (rect.left - boxRect.left) + 'px';
+                noBtn.style.top = (rect.top - boxRect.top) + 'px';
+                noBtn.style.right = 'auto';
+                noBtn.style.position = 'absolute';
+            }
+
+            // Pick next position
+            let nextIndex;
+            do {
+                nextIndex = Math.floor(Math.random() * possiblePositions.length);
+            } while (nextIndex === currentPosIndex);
+
+            currentPosIndex = nextIndex;
+            const pos = possiblePositions[currentPosIndex];
+
+            noBtn.style.top = pos.top;
+            noBtn.style.left = pos.left;
+        }
+
+
+        // --- 3. YES BUTTON LOGIC ---
+        const yesBtn = document.getElementById('yesBtn');
+        const headerGroup = document.getElementById('headerGroup');
+        const mainTitle = document.getElementById('mainTitle');
+        const successMessage = document.getElementById('successMessage');
+        const video = document.getElementById('videoElement');
+
+        // Sparkle effect on hover
+        yesBtn.addEventListener('mousemove', (e) => {
+            if (Math.random() < 0.3) {
+                createSparkle(e.clientX, e.clientY);
+            }
+        });
+
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            sparkle.style.left = x + 'px';
+            sparkle.style.top = y + 'px';
+            document.body.appendChild(sparkle);
+            setTimeout(() => sparkle.remove(), 1000);
+        }
+
+        yesBtn.addEventListener('click', celebrate);
+
+        function celebrate(e) {
+            // 0. PREPARE VIDEO (Detach so it doesn't fade with header)
+            // Get current geometry
+            const vidRect = video.getBoundingClientRect();
+            const boxRect = mainBox.getBoundingClientRect();
+
+            const startLeft = vidRect.left - boxRect.left;
+            const startTop = vidRect.top - boxRect.top;
+
+            // Snap to absolute position in mainBox immediately
+            video.style.transition = 'none'; // Disable transition for snap
+            video.style.position = 'absolute';
+            video.style.left = startLeft + 'px';
+            video.style.top = startTop + 'px';
+            video.style.width = video.offsetWidth + 'px';
+            video.style.margin = '0';
+            video.style.transform = 'none';
+
+            // Detach from headerGroup and attach to mainBox
+            // This prevents opacity inheritance from headerGroup
+            mainBox.appendChild(video);
+
+            // Force reflow
+            void video.offsetWidth;
+
+            // 1. Explosion & Shatter
+            createExplosion(e.clientX, e.clientY);
+
+            // SHATTER EFFECT:
+            const rect = yesBtn.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // Create shards
+            for (let i = 0; i < 12; i++) {
+                const shard = document.createElement('div');
+                shard.classList.add('shard');
+                shard.style.left = centerX + 'px';
+                shard.style.top = centerY + 'px';
+
+                // Randomize shape clip-path
+                const r1 = Math.random() * 100;
+                const r2 = Math.random() * 100;
+                const r3 = Math.random() * 100;
+                shard.style.clipPath = `polygon(${r1}% ${r2}%, ${r2}% ${r3}%, ${r3}% ${r1}%)`;
+                shard.style.width = (Math.random() * 20 + 10) + 'px';
+                shard.style.height = (Math.random() * 20 + 10) + 'px';
+                document.body.appendChild(shard);
+
+                // Animate
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 200 + 50;
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity;
+                const rot = Math.random() * 720;
+
+                shard.style.transition = 'all 0.8s ease-out';
+                // Force reflow
+                void shard.offsetWidth;
+
+                shard.style.transform = `translate(${tx}px, ${ty}px) rotate(${rot}deg)`;
+                shard.style.opacity = '0';
+
+                setTimeout(() => shard.remove(), 800);
+            }
+
+            // Hide actual button immediately
+            yesBtn.style.opacity = '0';
+            yesBtn.style.pointerEvents = 'none';
+
+            // 2. Fade out No button
+            noBtn.style.transition = 'opacity 0.5s';
+            noBtn.style.opacity = '0';
+            noBtn.style.pointerEvents = 'none';
+
+            // Fade out title
+            headerGroup.style.opacity = '0';
+
+            // 3. Start Animation Sequence
+            setTimeout(() => {
+
+                // 4. Animate Video to Bottom Center
+                // Calculate precise pixel target to ensure linear path (no curve from mixing & units)
+                const boxW = mainBox.offsetWidth;
+                const boxH = mainBox.offsetHeight;
+                const vidW = video.offsetWidth;
+                const vidH = video.offsetHeight;
+
+                const targetLeft = (boxW - vidW) / 2;
+                const targetTop = boxH - vidH - 80; // 80px from bottom
+
+                // Re-enable transition
+                video.style.transition = 'all 1.5s cubic-bezier(0.25, 1, 0.5, 1)';
+
+                // Set pixel coordinates
+                video.style.left = targetLeft + 'px';
+                video.style.top = targetTop + 'px';
+                video.style.bottom = 'auto'; // Ignore bottom
+                video.style.transform = 'none'; // No transform needed since we use manual centering
+
+                // 5. Show Message & Play Video AFTER video arrives
+                setTimeout(() => {
+                    successMessage.style.opacity = '1';
+                    video.loop = true;
+                    video.play();
+                }, 1500); // Wait 1.5s for transition
+
+            }, 500);
+        }
+
+        function createExplosion(x, y) {
+            const colors = ['#ff6b6b', '#ff9a9e', '#fad0c4', '#ffffff'];
+
+            // Confetti
+            for (let i = 0; i < 150; i++) {
+                const p = document.createElement('div');
+                p.classList.add('explosion-particle');
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                p.style.width = (Math.random() * 8 + 4) + 'px';
+                p.style.height = (Math.random() * 8 + 4) + 'px';
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 300 + 100;
+                const tx = Math.cos(angle) * velocity + 'px';
+                const ty = Math.sin(angle) * velocity + 'px';
+
+                p.style.setProperty('--tx', tx);
+                p.style.setProperty('--ty', ty);
+                p.style.borderRadius = Math.random() > 0.5 ? '50%' : '0'; // Circle or square
+
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 1000);
+            }
+
+            // Hearts
+            for (let i = 0; i < 30; i++) {
+                const h = document.createElement('div');
+                h.innerHTML = '❤️';
+                h.classList.add('explosion-particle');
+                h.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                h.style.left = x + 'px';
+                h.style.top = y + 'px';
+                h.style.background = 'transparent'; // Reset default
+
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 400 + 100;
+                const tx = Math.cos(angle) * velocity + 'px';
+                const ty = Math.sin(angle) * velocity + 'px';
+
+                h.style.setProperty('--tx', tx);
+                h.style.setProperty('--ty', ty);
+
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 1000);
+            }
+        }
+
+    </script>
+</body>
+
+</html>
