@@ -1,2 +1,2 @@
 # Meen-In-True-Love
-Trust isn’t claimed, it’s tested
+Turn every meenit into romance.
