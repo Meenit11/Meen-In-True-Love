@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Be My Valentine?</title>
+    <title>Will I Get WFH?</title>
     <style>
         :root {
             --primary-blue: #4a90e2;
@@ -177,6 +177,32 @@
             transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1);
             border: 3px solid var(--primary-blue);
         }
+        
+        /* GIF sliding animation */
+        .meme-gif {
+            width: 280px;
+            height: auto;
+            border-radius: 20px;
+            object-fit: cover;
+            position: absolute;
+            z-index: 50;
+            border: 3px solid var(--primary-blue);
+            left: -300px;
+            animation: slideInFromLeft 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        
+        @keyframes slideInFromLeft {
+            0% {
+                left: -300px;
+                opacity: 0;
+            }
+            100% {
+                left: 50%;
+                transform: translateX(-50%);
+                opacity: 1;
+            }
+        }
+        
         .buttons-container {
             margin-top: auto;
             margin-bottom: 80px;
@@ -293,16 +319,16 @@
     </div>
     <div class="main-box" id="mainBox">
         <div class="header-group" id="headerGroup">
-            <h1 id="mainTitle">Love Me Now &<br>Forever?</h1>
+            <h1 id="mainTitle">Will I Get<br>WFH?</h1>
             <!-- Image instead of video -->
             <img id="memeElement" class="meme-image" src="meme.png" alt="Meme">
         </div>
         <div class="success-message" id="successMessage">
             You took too much time in clicking yes,<br>
-            Knew you'd say yes again! 💕
+            Knew you'd say yes! 
         </div>
         <div class="buttons-container" id="btnContainer">
-            <button id="yesBtn">Yes 💕</button>
+            <button id="yesBtn">Yes</button>
             <button id="noBtn">No</button>
         </div>
     </div>
@@ -473,51 +499,27 @@
             
             headerGroup.style.opacity = '0';
             
-            // Immediately fade out meme.png
-            memeImg.style.transition = 'opacity 0.5s';
-            memeImg.style.opacity = '0';
+            // IMMEDIATELY remove meme.png
+            memeImg.remove();
             
-            // After fade out, create and show meme.gif
+            // Get box dimensions for positioning
+            const boxH = mainBox.offsetHeight;
+            
+            // Create and show meme.gif with slide-in animation
+            const memeGif = document.createElement('img');
+            memeGif.src = 'meme.gif';
+            memeGif.className = 'meme-gif';
+            
+            // Position at bottom center (will be adjusted by animation)
+            memeGif.style.bottom = '80px';
+            
+            // Add to mainBox
+            mainBox.appendChild(memeGif);
+            
+            // Show success message after gif starts sliding in
             setTimeout(() => {
-                // Remove old image
-                memeImg.remove();
-                
-                // Create new GIF element
-                const memeGif = document.createElement('img');
-                memeGif.src = 'meme.gif';
-                memeGif.className = 'meme-image';
-                memeGif.style.position = 'absolute';
-                memeGif.style.opacity = '0';
-                memeGif.style.zIndex = '50';
-                
-                // Calculate bottom center position
-                const boxW = mainBox.offsetWidth;
-                const boxH = mainBox.offsetHeight;
-                
-                // Add to mainBox
-                mainBox.appendChild(memeGif);
-                
-                // Wait for image to load to get dimensions
-                memeGif.onload = function() {
-                    const imgW = memeGif.offsetWidth;
-                    const imgH = memeGif.offsetHeight;
-                    
-                    const targetLeft = (boxW - imgW) / 2;
-                    const targetTop = boxH - imgH - 80;
-                    
-                    memeGif.style.left = targetLeft + 'px';
-                    memeGif.style.top = targetTop + 'px';
-                    
-                    // Smoothly fade in
-                    setTimeout(() => {
-                        memeGif.style.transition = 'opacity 0.8s';
-                        memeGif.style.opacity = '1';
-                        
-                        // Show success message
-                        successMessage.style.opacity = '1';
-                    }, 50);
-                };
-            }, 500);
+                successMessage.style.opacity = '1';
+            }, 400);
         }
         
         function createExplosion(x, y) {
